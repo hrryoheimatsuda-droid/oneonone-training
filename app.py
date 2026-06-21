@@ -92,6 +92,15 @@ st.title("🎭 評価面談ロールプレイ：部下「リク」")
 st.caption("評価に納得していない部下と1on1。3つの本音に向き合い、納得を引き出してください。")
 st.progress(resolved_count() / 3.0, text=f"納得度：{resolved_count()} / 3")
 
+# 成功演出（達成後の再描画で確実に表示。風船は初回のみ）
+if resolved_count() >= 3:
+    if not st.session_state.get("celebrated"):
+        st.balloons()
+        st.session_state.celebrated = True
+    st.success("✨ 面談成功！リクが納得して前を向きました（納得度 3 / 3）。"
+               "成果の承認・期待の明確化・将来への道筋――3つの本音に向き合えました。"
+               "下の「最初からやり直す」で再挑戦できます。")
+
 for message in st.session_state.messages:
     with st.chat_message(message["role"], avatar=message.get("avatar")):
         st.markdown(message["content"])
@@ -141,8 +150,6 @@ if prompt:
 
             st.markdown(reply)
             st.session_state.messages.append({"role": "assistant", "content": reply, "avatar": st.session_state.current_avatar})
-            if resolved_count() >= 3:
-                st.balloons()
             st.rerun()
 
         except json.JSONDecodeError:
@@ -150,10 +157,8 @@ if prompt:
         except Exception as e:
             st.error(f"通信エラーが発生しました：{e}")
 
-# --- 9. 状態に応じた通知 ---
-if done:
-    st.success("✨ リクが納得しました！面談成功です。3つの本音（成果の承認・期待の明確化・将来への道筋）に向き合えました。")
-elif limit_reached:
+# --- 9. 上限に達した場合の通知（成功演出は上部に表示） ---
+if limit_reached and not done:
     st.warning(f"このデモの対話上限（{MAX_USER_TURNS}回）に達しました。下のボタンでリセットして再挑戦できます。")
 
 # 進行中ヒント（受講者向けの薄いガイド）
