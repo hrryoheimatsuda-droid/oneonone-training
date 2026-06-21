@@ -129,7 +129,7 @@ if prompt:
     with st.chat_message("assistant", avatar=st.session_state.current_avatar):
         try:
             response = client.chat.completions.create(
-                model="gpt-4o-mini",
+                model="gpt-4o",
                 messages=[{"role": "system", "content": RIKU_SYSTEM}] +
                          [{"role": m["role"], "content": m["content"]} for m in st.session_state.messages],
                 response_format={"type": "json_object"},
